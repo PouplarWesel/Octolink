@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>Virtual Controller</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <!-- Connection Screen -->
+    <div id="connect-screen" class="screen active">
+        <div class="connect-container">
+            <h1>🎮 Virtual Controller</h1>
+            <p class="subtitle">Connect to play</p>
+            
+            <div class="input-group">
+                <label for="player-name">Your Name</label>
+                <input type="text" id="player-name" placeholder="Player" maxlength="20" autocomplete="off">
+            </div>
+            
+            <button id="connect-btn" class="primary-btn">
+                <span>Connect</span>
+            </button>
+            
+            <div id="connection-status" class="status"></div>
+        </div>
+    </div>
+
+    <!-- Reconnect Screen -->
+    <div id="reconnect-screen" class="screen">
+        <div class="connect-container">
+            <h1>🔄 Reconnect</h1>
+            <p class="subtitle">Select your controller slot</p>
+            
+            <div class="slot-grid">
+                <button class="slot-btn xbox-slot" data-slot="1">1<span class="slot-type">Xbox</span></button>
+                <button class="slot-btn xbox-slot" data-slot="2">2<span class="slot-type">Xbox</span></button>
+                <button class="slot-btn xbox-slot" data-slot="3">3<span class="slot-type">Xbox</span></button>
+                <button class="slot-btn xbox-slot" data-slot="4">4<span class="slot-type">Xbox</span></button>
+                <button class="slot-btn ps-slot" data-slot="5">5<span class="slot-type">PS4</span></button>
+                <button class="slot-btn ps-slot" data-slot="6">6<span class="slot-type">PS4</span></button>
+                <button class="slot-btn ps-slot" data-slot="7">7<span class="slot-type">PS4</span></button>
+                <button class="slot-btn ps-slot" data-slot="8">8<span class="slot-type">PS4</span></button>
+            </div>
+            
+            <p class="slot-note">Slots 1-4: Xbox 360 (XInput) | Slots 5-8: DualShock 4 (Steam)</p>
+            
+            <button id="back-btn" class="secondary-btn">Back to Auto-Connect</button>
+        </div>
+    </div>
+
+    <!-- Controller Screen -->
+    <div id="controller-screen" class="screen">
+        <!-- Compact Floating Info Bar (for fullscreen mode) -->
+        <div class="fullscreen-info-bar" id="fullscreen-info-bar">
+            <span id="fs-player-slot" class="fs-slot-badge">P1</span>
+            <span id="fs-player-name" class="fs-name">Player</span>
+            <span id="fs-controller-type" class="fs-type-badge">Xbox</span>
+            <span id="fs-status" class="fs-status connected">●</span>
+            <button class="fs-fix-btn" id="fix-fullscreen-btn" title="Fix Fullscreen">⛶</button>
+        </div>
+
+        <!-- Normal Info Bar -->
+        <div class="info-bar" id="normal-info-bar">
+            <div class="player-info">
+                <span id="player-slot" class="slot-badge">P1</span>
+                <span id="player-display-name">Player</span>
+                <span id="controller-type" class="controller-type-badge">Xbox</span>
+            </div>
+            <div class="info-bar-right">
+                <button id="toggle-layout-btn" class="icon-btn" title="Toggle Xbox/PlayStation buttons">🎮</button>
+                <div class="connection-indicator" id="ws-status">
+                    <span class="dot"></span>
+                    <span>Connected</span>
+                </div>
+                <button id="reconnect-btn" class="icon-btn" title="Change Controller">🔄</button>
+            </div>
+        </div>
+
+        <!-- Fullscreen Toggle Button (always visible, hold 5s) -->
+        <button class="fullscreen-toggle-btn" id="fullscreen-toggle-btn" title="Hold 5s to toggle fullscreen">
+            <span class="fs-icon">⛶</span>
+            <svg class="progress-ring" viewBox="0 0 50 50">
+                <circle class="progress-ring-bg" cx="25" cy="25" r="22"/>
+                <circle class="progress-ring-fill" id="fs-progress-ring" cx="25" cy="25" r="22"/>
+            </svg>
+        </button>
+
+        <!-- Settings Button (hidden in fullscreen, hold 5s) -->
+        <button class="settings-toggle-btn" id="settings-toggle-btn" title="Hold 5s for edit mode">
+            <span class="settings-icon">⚙</span>
+            <svg class="progress-ring" viewBox="0 0 50 50">
+                <circle class="progress-ring-bg" cx="25" cy="25" r="22"/>
+                <circle class="progress-ring-fill" id="settings-progress-ring" cx="25" cy="25" r="22"/>
+            </svg>
+        </button>
+
+        <!-- Edit Mode Indicator -->
+        <div class="edit-mode-indicator" id="edit-mode-indicator">
+            <span>✏️ Edit Mode</span>
+            <button class="split-face-btn" id="split-face-btn">Split Buttons</button>
+            <button class="reset-layout-btn" id="reset-layout-btn">Reset</button>
+            <button class="done-edit-btn" id="done-edit-btn">Done</button>
+        </div>
+
+        <!-- Per-Group Size Control (shown when tapping a group in edit mode) -->
+        <div class="group-size-control" id="group-size-control">
+            <span class="group-size-label" id="group-size-name">Group</span>
+            <button class="group-size-btn" id="group-size-decrease">−</button>
+            <span class="group-size-value" id="group-size-value">100%</span>
+            <button class="group-size-btn" id="group-size-increase">+</button>
+        </div>
+
+        <!-- Controller Layout -->
+        <div class="controller" id="controller-wrapper">
+            <!-- Top Row - Bumpers and Triggers -->
+            <div class="control-group draggable-group" id="group-top" data-group="top" data-scale="100">
+                <div class="drag-handle">⋮⋮</div>
+                <div class="resize-handle">↘</div>
+                <div class="group-content top-row">
+                    <div class="trigger-group left">
+                        <div class="trigger" id="lt" data-input="lt" data-xbox="LT" data-ps="L2">LT</div>
+                        <div class="bumper" id="lb" data-input="lb" data-xbox="LB" data-ps="L1">LB</div>
+                    </div>
+                    <div class="center-buttons">
+                        <button class="menu-btn" id="back" data-input="back" data-xbox="⏪" data-ps="SHARE">⏪</button>
+                        <button class="guide-btn" id="guide" data-input="guide">⏺</button>
+                        <button class="menu-btn" id="start" data-input="start" data-xbox="⏩" data-ps="OPT">⏩</button>
+                    </div>
+                    <div class="trigger-group right">
+                        <div class="trigger" id="rt" data-input="rt" data-xbox="RT" data-ps="R2">RT</div>
+                        <div class="bumper" id="rb" data-input="rb" data-xbox="RB" data-ps="R1">RB</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Row - Sticks, D-Pad, Face Buttons -->
+            <div class="main-row">
+                <!-- Left Side -->
+                <div class="left-side">
+                    <!-- D-Pad -->
+                    <div class="control-group draggable-group" id="group-dpad" data-group="dpad" data-scale="100">
+                        <div class="drag-handle">⋮⋮</div>
+                        <div class="resize-handle">↘</div>
+                        <div class="group-content dpad">
+                            <button class="dpad-btn up" id="up" data-input="up">▲</button>
+                            <button class="dpad-btn left" id="left" data-input="left">◀</button>
+                            <button class="dpad-btn right" id="right" data-input="right">▶</button>
+                            <button class="dpad-btn down" id="down" data-input="down">▼</button>
+                            <div class="dpad-center"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Left Stick -->
+                    <div class="control-group draggable-group" id="group-lstick" data-group="lstick" data-scale="100">
+                        <div class="drag-handle">⋮⋮</div>
+                        <div class="resize-handle">↘</div>
+                        <div class="group-content stick-container" id="left-stick-container">
+                            <div class="stick-area">
+                                <div class="stick" id="left-stick">
+                                    <div class="stick-dot"></div>
+                                </div>
+                            </div>
+                            <button class="stick-click" id="ls" data-input="ls">L3</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Side -->
+                <div class="right-side">
+                    <!-- Face Buttons (grouped) -->
+                    <div class="control-group draggable-group" id="group-face" data-group="face" data-scale="100">
+                        <div class="drag-handle">⋮⋮</div>
+                        <div class="resize-handle">↘</div>
+                        <div class="group-content face-buttons">
+                            <button class="face-btn y-btn" id="y" data-input="y" data-xbox="Y" data-ps="△">Y</button>
+                            <button class="face-btn x-btn" id="x" data-input="x" data-xbox="X" data-ps="□">X</button>
+                            <button class="face-btn b-btn" id="b" data-input="b" data-xbox="B" data-ps="○">B</button>
+                            <button class="face-btn a-btn" id="a" data-input="a" data-xbox="A" data-ps="✕">A</button>
+                        </div>
+                    </div>
+
+                    <!-- Individual Face Buttons (for split mode) -->
+                    <div class="control-group draggable-group individual-btn" id="group-btn-a" data-group="btn-a" data-scale="100">
+                        <div class="drag-handle">⋮⋮</div>
+                        <div class="resize-handle">↘</div>
+                        <button class="group-content face-btn a-btn single-btn" id="a-split" data-input="a" data-xbox="A" data-ps="✕">A</button>
+                    </div>
+                    <div class="control-group draggable-group individual-btn" id="group-btn-b" data-group="btn-b" data-scale="100">
+                        <div class="drag-handle">⋮⋮</div>
+                        <div class="resize-handle">↘</div>
+                        <button class="group-content face-btn b-btn single-btn" id="b-split" data-input="b" data-xbox="B" data-ps="○">B</button>
+                    </div>
+                    <div class="control-group draggable-group individual-btn" id="group-btn-x" data-group="btn-x" data-scale="100">
+                        <div class="drag-handle">⋮⋮</div>
+                        <div class="resize-handle">↘</div>
+                        <button class="group-content face-btn x-btn single-btn" id="x-split" data-input="x" data-xbox="X" data-ps="□">X</button>
+                    </div>
+                    <div class="control-group draggable-group individual-btn" id="group-btn-y" data-group="btn-y" data-scale="100">
+                        <div class="drag-handle">⋮⋮</div>
+                        <div class="resize-handle">↘</div>
+                        <button class="group-content face-btn y-btn single-btn" id="y-split" data-input="y" data-xbox="Y" data-ps="△">Y</button>
+                    </div>
+                    
+                    <!-- Right Stick -->
+                    <div class="control-group draggable-group" id="group-rstick" data-group="rstick" data-scale="100">
+                        <div class="drag-handle">⋮⋮</div>
+                        <div class="resize-handle">↘</div>
+                        <div class="group-content stick-container" id="right-stick-container">
+                            <div class="stick-area">
+                                <div class="stick" id="right-stick">
+                                    <div class="stick-dot"></div>
+                                </div>
+                            </div>
+                            <button class="stick-click" id="rs" data-input="rs">R3</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="controller.js"></script>
+</body>
+</html>

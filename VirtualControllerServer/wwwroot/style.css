@@ -1,0 +1,1418 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+:root {
+    --bg-primary: #1a1a2e;
+    --bg-secondary: #16213e;
+    --bg-accent: #0f3460;
+    --highlight: #e94560;
+    --success: #4ecca3;
+    --warning: #ffc107;
+    --text: #eaeaea;
+    --text-dim: #888;
+    
+    --btn-a: #4caf50;
+    --btn-b: #f44336;
+    --btn-x: #2196f3;
+    --btn-y: #ffc107;
+    
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg-primary);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    touch-action: none;
+}
+
+/* Screens */
+.screen {
+    display: none;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+.screen.active {
+    display: flex;
+}
+
+/* Connect Screen */
+#connect-screen, #reconnect-screen {
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+}
+
+.connect-container {
+    text-align: center;
+    padding: 30px;
+    max-width: 350px;
+    width: 100%;
+}
+
+.connect-container h1 {
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: var(--text-dim);
+    margin-bottom: 30px;
+}
+
+.input-group {
+    margin-bottom: 25px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+}
+
+.input-group input {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid var(--bg-accent);
+    border-radius: 12px;
+    background: var(--bg-secondary);
+    color: var(--text);
+    font-size: 1.1rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.input-group input:focus {
+    border-color: var(--highlight);
+}
+
+.primary-btn {
+    width: 100%;
+    padding: 18px;
+    background: var(--highlight);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s, opacity 0.2s;
+}
+
+.primary-btn:active {
+    transform: scale(0.98);
+}
+
+.primary-btn:disabled {
+    opacity: 0.6;
+}
+
+.secondary-btn {
+    margin-top: 20px;
+    padding: 12px 24px;
+    background: transparent;
+    border: 2px solid var(--bg-accent);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.status {
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.status.error {
+    background: rgba(244, 67, 54, 0.2);
+    color: #f44336;
+}
+
+.status.success {
+    background: rgba(78, 204, 163, 0.2);
+    color: var(--success);
+}
+
+/* Slot Grid */
+.slot-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 25px 0;
+}
+
+.slot-btn {
+    aspect-ratio: 1;
+    border: 2px solid var(--bg-accent);
+    border-radius: 12px;
+    background: var(--bg-secondary);
+    color: var(--text);
+    font-size: 1.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.slot-type {
+    font-size: 0.6rem;
+    opacity: 0.7;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.slot-btn:active {
+    background: var(--highlight);
+    border-color: var(--highlight);
+}
+
+/* Xbox slots (1-4) - green border */
+.slot-btn.xbox-slot {
+    border-color: #107c10;
+}
+
+.slot-btn.xbox-slot:hover {
+    background: rgba(16, 124, 16, 0.2);
+}
+
+/* PlayStation slots (5-8) - blue border */
+.slot-btn.ps-slot {
+    border-color: #003791;
+}
+
+.slot-btn.ps-slot:hover {
+    background: rgba(0, 55, 145, 0.2);
+}
+
+.slot-note {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-bottom: 15px;
+}
+
+/* Controller Screen */
+#controller-screen {
+    flex-direction: column;
+    background: var(--bg-primary);
+    padding-top: var(--safe-top);
+    padding-bottom: var(--safe-bottom);
+}
+
+/* Info Bar */
+.info-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 15px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--bg-accent);
+}
+
+.info-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.player-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.slot-badge {
+    background: var(--highlight);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.controller-type-badge {
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.controller-type-badge.xbox {
+    background: #107c10;
+    color: white;
+}
+
+.controller-type-badge.playstation {
+    background: #003791;
+    color: white;
+}
+
+#player-display-name {
+    font-weight: 500;
+}
+
+.connection-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: var(--success);
+}
+
+.connection-indicator .dot {
+    width: 8px;
+    height: 8px;
+    background: var(--success);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.connection-indicator.disconnected {
+    color: var(--highlight);
+}
+
+.connection-indicator.disconnected .dot {
+    background: var(--highlight);
+    animation: none;
+}
+
+.icon-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.3rem;
+    cursor: pointer;
+    padding: 5px;
+}
+
+/* PlayStation button colors */
+.controller.playstation .y-btn { background: #36c78f !important; } /* Triangle - Green/Teal */
+.controller.playstation .x-btn { background: #de7ebe !important; } /* Square - Pink */
+.controller.playstation .b-btn { background: #ee6a6a !important; } /* Circle - Red */
+.controller.playstation .a-btn { background: #6e9bcf !important; } /* Cross - Blue */
+
+/* Controller Layout */
+.controller {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    gap: 10px;
+    max-height: calc(100% - 50px);
+}
+
+/* Top Row */
+.top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 0 10px;
+}
+
+.trigger-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.trigger {
+    width: 70px;
+    height: 50px;
+    background: var(--bg-secondary);
+    border: 2px solid var(--bg-accent);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    transition: all 0.05s;
+}
+
+.trigger.active {
+    background: var(--highlight);
+    border-color: var(--highlight);
+    color: white;
+}
+
+.bumper {
+    width: 70px;
+    height: 40px;
+    background: var(--bg-secondary);
+    border: 2px solid var(--bg-accent);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    transition: all 0.05s;
+}
+
+.bumper.active {
+    background: var(--highlight);
+    border-color: var(--highlight);
+    color: white;
+}
+
+.center-buttons {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.menu-btn {
+    width: 45px;
+    height: 45px;
+    background: var(--bg-secondary);
+    border: 2px solid var(--bg-accent);
+    border-radius: 50%;
+    font-size: 1rem;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.05s;
+}
+
+.menu-btn.active {
+    background: var(--bg-accent);
+    color: white;
+}
+
+.guide-btn {
+    width: 50px;
+    height: 50px;
+    background: var(--bg-secondary);
+    border: 3px solid var(--bg-accent);
+    border-radius: 50%;
+    font-size: 1.2rem;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.05s;
+}
+
+.guide-btn.active {
+    background: var(--success);
+    border-color: var(--success);
+    color: white;
+}
+
+/* Main Row */
+.main-row {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 5px;
+    gap: 10px;
+}
+
+.left-side, .right-side {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+/* D-Pad */
+.dpad {
+    position: relative;
+    width: 130px;
+    height: 130px;
+}
+
+.dpad-btn {
+    position: absolute;
+    width: 45px;
+    height: 45px;
+    background: var(--bg-secondary);
+    border: 2px solid var(--bg-accent);
+    border-radius: 8px;
+    font-size: 1.2rem;
+    color: var(--text-dim);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.05s;
+}
+
+.dpad-btn.active {
+    background: var(--highlight);
+    border-color: var(--highlight);
+    color: white;
+}
+
+.dpad-btn.up { top: 0; left: 50%; transform: translateX(-50%); }
+.dpad-btn.down { bottom: 0; left: 50%; transform: translateX(-50%); }
+.dpad-btn.left { left: 0; top: 50%; transform: translateY(-50%); }
+.dpad-btn.right { right: 0; top: 50%; transform: translateY(-50%); }
+
+.dpad-center {
+    position: absolute;
+    width: 35px;
+    height: 35px;
+    background: var(--bg-accent);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Face Buttons */
+.face-buttons {
+    position: relative;
+    width: 140px;
+    height: 140px;
+}
+
+.face-btn {
+    position: absolute;
+    width: 52px;
+    height: 52px;
+    border: 3px solid;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.05s;
+}
+
+.face-btn.y-btn { 
+    top: 0; left: 50%; transform: translateX(-50%);
+    background: transparent;
+    border-color: var(--btn-y);
+    color: var(--btn-y);
+}
+.face-btn.y-btn.active { background: var(--btn-y); color: var(--bg-primary); }
+
+.face-btn.a-btn { 
+    bottom: 0; left: 50%; transform: translateX(-50%);
+    background: transparent;
+    border-color: var(--btn-a);
+    color: var(--btn-a);
+}
+.face-btn.a-btn.active { background: var(--btn-a); color: var(--bg-primary); }
+
+.face-btn.x-btn { 
+    left: 0; top: 50%; transform: translateY(-50%);
+    background: transparent;
+    border-color: var(--btn-x);
+    color: var(--btn-x);
+}
+.face-btn.x-btn.active { background: var(--btn-x); color: white; }
+
+.face-btn.b-btn { 
+    right: 0; top: 50%; transform: translateY(-50%);
+    background: transparent;
+    border-color: var(--btn-b);
+    color: var(--btn-b);
+}
+.face-btn.b-btn.active { background: var(--btn-b); color: white; }
+
+/* Analog Sticks */
+.stick-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.stick-area {
+    width: 120px;
+    height: 120px;
+    background: var(--bg-secondary);
+    border: 3px solid var(--bg-accent);
+    border-radius: 50%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stick {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(145deg, #3a3a5a, #2a2a4a);
+    border: 3px solid var(--bg-accent);
+    border-radius: 50%;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: none;
+    transition: transform 0.02s linear;
+}
+
+.stick-dot {
+    width: 20px;
+    height: 20px;
+    background: var(--highlight);
+    border-radius: 50%;
+    opacity: 0.7;
+}
+
+.stick-click {
+    padding: 6px 16px;
+    background: var(--bg-secondary);
+    border: 2px solid var(--bg-accent);
+    border-radius: 6px;
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.05s;
+}
+
+.stick-click.active {
+    background: var(--highlight);
+    border-color: var(--highlight);
+    color: white;
+}
+
+/* Landscape optimizations */
+@media (orientation: landscape) and (max-height: 500px) {
+    .info-bar {
+        padding: 5px 15px;
+    }
+    
+    .controller {
+        padding: 5px 15px;
+        flex-direction: row;
+    }
+    
+    .top-row {
+        position: absolute;
+        top: 45px;
+        left: 0;
+        right: 0;
+        padding: 5px 20px;
+    }
+    
+    .main-row {
+        width: 100%;
+        padding-top: 40px;
+    }
+    
+    .dpad, .face-buttons {
+        width: 110px;
+        height: 110px;
+    }
+    
+    .dpad-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 1rem;
+    }
+    
+    .face-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 1rem;
+    }
+    
+    .stick-area {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .stick {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .trigger {
+        width: 60px;
+        height: 40px;
+        font-size: 0.8rem;
+    }
+    
+    .bumper {
+        width: 60px;
+        height: 32px;
+        font-size: 0.75rem;
+    }
+}
+
+/* Vibration feedback indicator */
+.vibrate {
+    animation: vibrate 0.1s;
+}
+
+@keyframes vibrate {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    75% { transform: translateX(2px); }
+}
+
+/* Layout hiding and scaling system */
+.layout-hidden {
+    display: none !important;
+}
+
+/* Layout indicator popup */
+.layout-indicator {
+    position: fixed;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: rgba(233, 69, 96, 0.95);
+    color: white;
+    padding: 10px 25px;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.layout-indicator.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ============================================
+   FULLSCREEN MODE STYLES
+   ============================================ */
+
+/* Fullscreen Info Bar (compact floating) */
+.fullscreen-info-bar {
+    display: none;
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(22, 33, 62, 0.9);
+    border: 1px solid var(--bg-accent);
+    border-radius: 25px;
+    padding: 6px 15px;
+    z-index: 1000;
+    align-items: center;
+    gap: 10px;
+    backdrop-filter: blur(10px);
+    font-size: 0.75rem;
+}
+
+.fullscreen-mode .fullscreen-info-bar {
+    display: flex;
+}
+
+.fullscreen-mode #normal-info-bar {
+    display: none !important;
+}
+
+.fs-slot-badge {
+    background: var(--highlight);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 0.7rem;
+}
+
+.fs-name {
+    color: var(--text);
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.fs-type-badge {
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.6rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.fs-type-badge.xbox {
+    background: #107c10;
+    color: white;
+}
+
+.fs-type-badge.playstation {
+    background: #003791;
+    color: white;
+}
+
+.fs-status {
+    font-size: 0.8rem;
+}
+
+.fs-status.connected {
+    color: var(--success);
+}
+
+.fs-status.disconnected {
+    color: var(--highlight);
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.fs-resize-controls {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: 5px;
+    padding-left: 10px;
+    border-left: 1px solid var(--bg-accent);
+}
+
+.fs-resize-btn {
+    width: 22px;
+    height: 22px;
+    background: var(--bg-accent);
+    border: none;
+    border-radius: 50%;
+    color: var(--text);
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.fs-resize-btn:active {
+    background: var(--highlight);
+}
+
+.fs-size-label {
+    font-size: 0.65rem;
+    min-width: 32px;
+    text-align: center;
+    color: var(--text-dim);
+}
+
+/* Fix Fullscreen Button */
+.fs-fix-btn {
+    background: var(--bg-accent);
+    border: none;
+    border-radius: 5px;
+    color: var(--text);
+    padding: 4px 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-left: auto;
+}
+
+.fs-fix-btn:active {
+    background: var(--highlight);
+}
+
+/* Fullscreen & Settings Toggle Buttons */
+.fullscreen-toggle-btn,
+.settings-toggle-btn {
+    position: fixed;
+    width: 50px;
+    height: 50px;
+    background: rgba(22, 33, 62, 0.85);
+    border: 2px solid var(--bg-accent);
+    border-radius: 50%;
+    color: var(--text);
+    font-size: 1.4rem;
+    cursor: pointer;
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+}
+
+.fullscreen-toggle-btn {
+    bottom: 15px;
+    right: 15px;
+}
+
+.settings-toggle-btn {
+    bottom: 15px;
+    left: 15px;
+}
+
+/* Settings button stays visible in fullscreen mode */
+
+.fullscreen-mode .fullscreen-toggle-btn {
+    background: rgba(233, 69, 96, 0.3);
+    border-color: var(--highlight);
+}
+
+.fs-icon,
+.settings-icon {
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Progress Ring for Hold Buttons */
+.progress-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+    pointer-events: none;
+}
+
+.progress-ring-bg {
+    fill: none;
+    stroke: var(--bg-accent);
+    stroke-width: 3;
+}
+
+.progress-ring-fill {
+    fill: none;
+    stroke: var(--highlight);
+    stroke-width: 3;
+    stroke-dasharray: 138.2;
+    stroke-dashoffset: 138.2;
+    transition: stroke-dashoffset 0.1s linear;
+}
+
+.settings-toggle-btn .progress-ring-fill {
+    stroke: var(--warning);
+}
+
+/* Edit Mode Indicator */
+.edit-mode-indicator {
+    display: none;
+    position: fixed;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 193, 7, 0.95);
+    color: #000;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    z-index: 2000;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.edit-mode .edit-mode-indicator {
+    display: flex;
+}
+
+.reset-layout-btn,
+.done-edit-btn,
+.split-face-btn {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.reset-layout-btn {
+    background: #333;
+    color: white;
+}
+
+.done-edit-btn {
+    background: var(--success);
+    color: white;
+}
+
+.split-face-btn {
+    background: var(--btn-x);
+    color: white;
+}
+
+.split-face-btn.active {
+    background: var(--highlight);
+}
+
+/* Per-Group Size Control */
+.group-size-control {
+    display: none;
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(22, 33, 62, 0.95);
+    border: 2px solid var(--highlight);
+    padding: 8px 15px;
+    border-radius: 25px;
+    z-index: 2001;
+    align-items: center;
+    gap: 10px;
+    backdrop-filter: blur(10px);
+}
+
+.group-size-control.visible {
+    display: flex;
+}
+
+.group-size-label {
+    font-size: 0.75rem;
+    color: var(--text);
+    font-weight: 600;
+    min-width: 60px;
+}
+
+.group-size-btn {
+    width: 30px;
+    height: 30px;
+    background: var(--bg-accent);
+    border: none;
+    border-radius: 50%;
+    color: var(--text);
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.group-size-btn:active {
+    background: var(--highlight);
+}
+
+.group-size-value {
+    font-size: 0.8rem;
+    min-width: 40px;
+    text-align: center;
+    color: var(--text);
+}
+
+/* ============================================
+   DRAGGABLE CONTROL GROUPS
+   ============================================ */
+
+.control-group {
+    position: relative;
+}
+
+/* Hide drag handles by default */
+.drag-handle {
+    display: none;
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--warning);
+    color: #000;
+    padding: 2px 12px;
+    border-radius: 10px 10px 0 0;
+    font-size: 0.7rem;
+    font-weight: bold;
+    cursor: move;
+    z-index: 10;
+    letter-spacing: 3px;
+}
+
+/* Resize handle (bottom-right corner) */
+.resize-handle {
+    display: none;
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    width: 28px;
+    height: 28px;
+    background: var(--highlight);
+    color: white;
+    border-radius: 50%;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: nwse-resize;
+    z-index: 11;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+/* Show resize handles in edit mode for visible groups */
+.edit-mode .control-group.draggable-group:not(.layout-hidden):not(.individual-btn) .resize-handle {
+    display: flex;
+}
+
+/* Show resize handles for individual buttons in split mode */
+.edit-mode.split-mode .individual-btn:not(.layout-hidden) .resize-handle {
+    display: flex;
+}
+
+/* Only show drag handles for VISIBLE non-individual groups in edit mode */
+.edit-mode .control-group.draggable-group:not(.layout-hidden):not(.individual-btn) .drag-handle {
+    display: block;
+}
+
+/* Show individual button handles only when split mode is active AND face is visible */
+.edit-mode.split-mode .individual-btn:not(.layout-hidden) .drag-handle {
+    display: block;
+}
+
+/* Only outline visible non-individual groups in edit mode */
+.edit-mode .control-group.draggable-group:not(.layout-hidden):not(.individual-btn) {
+    outline: 2px dashed rgba(255, 193, 7, 0.5);
+    outline-offset: 8px;
+    border-radius: 10px;
+}
+
+.control-group.dragging {
+    opacity: 0.85;
+    z-index: 100;
+    outline-color: var(--highlight) !important;
+}
+
+.control-group.dragging .drag-handle {
+    background: var(--highlight);
+    color: white;
+}
+
+/* Individual face buttons (for split mode) */
+.individual-btn {
+    display: none !important;
+}
+
+.split-mode .individual-btn {
+    display: block !important;
+}
+
+.split-mode #group-face {
+    display: none !important;
+}
+
+/* Position handles differently for individual buttons */
+.individual-btn .drag-handle {
+    top: -30px;
+    bottom: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 2px 8px;
+    font-size: 0.6rem;
+    border-radius: 8px;
+    letter-spacing: 1px;
+}
+
+.individual-btn .resize-handle {
+    top: auto;
+    bottom: -30px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: 26px;
+    height: 26px;
+    font-size: 0.8rem;
+}
+
+.single-btn {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    font-size: 1.4rem;
+    font-weight: bold;
+    border: none;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    touch-action: manipulation;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+/* Color individual buttons like their grouped counterparts */
+.single-btn.a-btn { background: var(--btn-a); }
+.single-btn.b-btn { background: var(--btn-b); }
+.single-btn.x-btn { background: var(--btn-x); }
+.single-btn.y-btn { background: var(--btn-y); }
+
+.single-btn:active,
+.single-btn.active {
+    transform: scale(0.9);
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.4);
+}
+
+/* Outline individual buttons in edit mode when split */
+.edit-mode.split-mode .individual-btn {
+    outline: 2px dashed rgba(255, 193, 7, 0.5);
+    outline-offset: 5px;
+    border-radius: 50%;
+}
+
+/* Selected group highlight */
+.control-group.selected {
+    outline-color: var(--highlight) !important;
+    outline-style: solid !important;
+}
+
+/* Fullscreen mode: absolute positioning for draggable groups */
+.fullscreen-mode .draggable-group:not(.layout-hidden) {
+    position: absolute !important;
+    transition: none;
+}
+
+/* Hide layout-hidden groups completely */
+.layout-hidden {
+    display: none !important;
+}
+
+.fullscreen-mode .main-row,
+.fullscreen-mode .left-side,
+.fullscreen-mode .right-side {
+    display: contents;
+}
+
+.fullscreen-mode .controller {
+    position: relative;
+    height: 100%;
+    padding: 60px 10px 70px;
+}
+
+/* ============================================
+   PER-GROUP DYNAMIC SCALING
+   ============================================ */
+
+/* Per-group scale using data attribute */
+.control-group[data-scale="50"] .group-content { transform: scale(0.5); }
+.control-group[data-scale="60"] .group-content { transform: scale(0.6); }
+.control-group[data-scale="70"] .group-content { transform: scale(0.7); }
+.control-group[data-scale="80"] .group-content { transform: scale(0.8); }
+.control-group[data-scale="90"] .group-content { transform: scale(0.9); }
+.control-group[data-scale="100"] .group-content { transform: scale(1); }
+.control-group[data-scale="110"] .group-content { transform: scale(1.1); }
+.control-group[data-scale="120"] .group-content { transform: scale(1.2); }
+.control-group[data-scale="130"] .group-content { transform: scale(1.3); }
+.control-group[data-scale="140"] .group-content { transform: scale(1.4); }
+.control-group[data-scale="150"] .group-content { transform: scale(1.5); }
+.control-group[data-scale="160"] .group-content { transform: scale(1.6); }
+.control-group[data-scale="170"] .group-content { transform: scale(1.7); }
+.control-group[data-scale="180"] .group-content { transform: scale(1.8); }
+.control-group[data-scale="190"] .group-content { transform: scale(1.9); }
+.control-group[data-scale="200"] .group-content { transform: scale(2); }
+
+.group-content {
+    transform-origin: center center;
+}
+
+/* Legacy global scaling (keep for compatibility) */
+.controller[data-scale="50"] { --ctrl-scale: 0.5; }
+.controller[data-scale="60"] { --ctrl-scale: 0.6; }
+.controller[data-scale="70"] { --ctrl-scale: 0.7; }
+.controller[data-scale="80"] { --ctrl-scale: 0.8; }
+.controller[data-scale="90"] { --ctrl-scale: 0.9; }
+.controller[data-scale="100"] { --ctrl-scale: 1; }
+.controller[data-scale="110"] { --ctrl-scale: 1.1; }
+.controller[data-scale="120"] { --ctrl-scale: 1.2; }
+.controller[data-scale="130"] { --ctrl-scale: 1.3; }
+.controller[data-scale="140"] { --ctrl-scale: 1.4; }
+.controller[data-scale="150"] { --ctrl-scale: 1.5; }
+
+/* Scale classes for simplified layouts */
+.controller.scale-large .dpad {
+    width: 160px;
+    height: 160px;
+}
+
+.controller.scale-large .dpad-btn {
+    width: 55px;
+    height: 55px;
+    font-size: 1.4rem;
+}
+
+.controller.scale-large .face-buttons {
+    width: 170px;
+    height: 170px;
+}
+
+.controller.scale-large .face-btn {
+    width: 65px;
+    height: 65px;
+    font-size: 1.4rem;
+}
+
+.controller.scale-large .stick-area {
+    width: 140px;
+    height: 140px;
+}
+
+.controller.scale-large .stick {
+    width: 70px;
+    height: 70px;
+}
+
+.controller.scale-large .trigger {
+    width: 85px;
+    height: 60px;
+    font-size: 1.1rem;
+}
+
+.controller.scale-large .bumper {
+    width: 85px;
+    height: 48px;
+    font-size: 1rem;
+}
+
+/* Extra large scaling for minimal layouts */
+.controller.scale-xl .dpad {
+    width: 200px;
+    height: 200px;
+}
+
+.controller.scale-xl .dpad-btn {
+    width: 70px;
+    height: 70px;
+    font-size: 1.8rem;
+}
+
+.controller.scale-xl .dpad-center {
+    width: 50px;
+    height: 50px;
+}
+
+.controller.scale-xl .face-buttons {
+    width: 210px;
+    height: 210px;
+}
+
+.controller.scale-xl .face-btn {
+    width: 80px;
+    height: 80px;
+    font-size: 1.8rem;
+    border-width: 4px;
+}
+
+.controller.scale-xl .stick-area {
+    width: 170px;
+    height: 170px;
+}
+
+.controller.scale-xl .stick {
+    width: 85px;
+    height: 85px;
+}
+
+.controller.scale-xl .stick-dot {
+    width: 28px;
+    height: 28px;
+}
+
+.controller.scale-xl .stick-click {
+    padding: 10px 24px;
+    font-size: 1rem;
+}
+
+/* Center controls when only one side is visible */
+.left-side:only-child,
+.right-side:only-child {
+    flex: none;
+    width: 100%;
+    justify-content: center;
+}
+
+/* Landscape optimizations with scaling */
+@media (orientation: landscape) and (max-height: 500px) {
+    .controller.scale-large .dpad,
+    .controller.scale-large .face-buttons {
+        width: 130px;
+        height: 130px;
+    }
+    
+    .controller.scale-large .dpad-btn {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .controller.scale-large .face-btn {
+        width: 52px;
+        height: 52px;
+    }
+    
+    .controller.scale-large .stick-area {
+        width: 115px;
+        height: 115px;
+    }
+    
+    .controller.scale-large .stick {
+        width: 58px;
+        height: 58px;
+    }
+    
+    .controller.scale-xl .dpad,
+    .controller.scale-xl .face-buttons {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .controller.scale-xl .dpad-btn {
+        width: 52px;
+        height: 52px;
+        font-size: 1.4rem;
+    }
+    
+    .controller.scale-xl .face-btn {
+        width: 60px;
+        height: 60px;
+        font-size: 1.4rem;
+    }
+    
+    .controller.scale-xl .stick-area {
+        width: 130px;
+        height: 130px;
+    }
+    
+    .controller.scale-xl .stick {
+        width: 65px;
+        height: 65px;
+    }
+    
+    /* Landscape fullscreen adjustments */
+    .fullscreen-info-bar {
+        top: 5px;
+        padding: 4px 12px;
+        font-size: 0.7rem;
+    }
+    
+    .fullscreen-toggle-btn,
+    .settings-toggle-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
+    }
+    
+    .edit-mode-indicator {
+        top: 35px;
+        padding: 6px 15px;
+        font-size: 0.75rem;
+    }
+}
+
