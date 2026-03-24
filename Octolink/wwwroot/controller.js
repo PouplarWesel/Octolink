@@ -10,11 +10,6 @@ class VirtualController {
         this.playerSlot = 0;
         this.isConnected = false;
         this.buttonLayout = 'xbox'; // 'xbox' or 'playstation'
-        this.inputSeq = 0;
-        this.pendingInputFrame = null;
-        this.pendingInputPayload = null;
-        this.heartbeatTimer = null;
-        this.activeButtonTouches = {};
         
         // iOS detection
         this.isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
@@ -284,9 +279,6 @@ class VirtualController {
         
         this.elements.connectBtn.disabled = true;
         this.showStatus('Connecting...');
-
-        this.inputSeq = 0;
-        this.releaseAllInputs();
         
         this.initWebSocket(() => {
             // Send connect message
@@ -313,9 +305,8 @@ class VirtualController {
         }
         
         // Connect to WebSocket server (port + 1)
-        const runtime = window.__OCTOLINK_CONFIG__ || {};
-        const wsScheme = location.protocol === 'https:' ? 'wss' : 'ws';
-        const wsUrl = runtime.websocketUrl || `${wsScheme}://${location.hostname}:${parseInt(location.port || '80') + 1}/`;
+        const wsPort = parseInt(location.port) + 1;
+        const wsUrl = `ws://${location.hostname}:${wsPort}/`;
         
         try {
             this.ws = new WebSocket(wsUrl);
@@ -324,7 +315,6 @@ class VirtualController {
             this.ws.onopen = () => {
                 console.log('WebSocket connected');
                 this.isConnected = true;
-                this.startHeartbeat();
                 if (onOpen) onOpen();
             };
             
@@ -341,9 +331,6 @@ class VirtualController {
             this.ws.onclose = () => {
                 console.log('WebSocket closed');
                 this.isConnected = false;
-                this.stopHeartbeat();
-                this.flushPendingInput(true);
-                this.releaseAllInputs();
                 this.updateConnectionStatus(false);
                 
                 // Auto-reconnect if on controller screen
@@ -356,66 +343,9 @@ class VirtualController {
             this.elements.connectBtn.disabled = false;
         }
     }
-
-    startHeartbeat() {
-        this.stopHeartbeat();
-        this.heartbeatTimer = setInterval(() => {
-            if (this.isConnected) {
-                this.send({ type: 'heartbeat' });
-            }
-        }, 5000);
-    }
-
-    stopHeartbeat() {
-        if (this.heartbeatTimer) {
-            clearInterval(this.heartbeatTimer);
-            this.heartbeatTimer = null;
-        }
-    }
-
-    releaseAllInputs() {
-        Object.keys(this.state).forEach(key => {
-            if (typeof this.state[key] === 'boolean') this.state[key] = false;
-        });
-        this.state.lt = 0;
-        this.state.rt = 0;
-        this.state.lx = 0;
-        this.state.ly = 0;
-        this.state.rx = 0;
-        this.state.ry = 0;
-
-        Object.keys(this.activeButtonTouches).forEach(btn => {
-            this.activeButtonTouches[btn] = null;
-            const el = document.getElementById(btn) || document.getElementById(btn + '-split');
-            el?.classList.remove('active');
-        });
-
-        this.resetStick('left');
-        this.resetStick('right');
-
-        if (this.leftTrigger.active) {
-            this.leftTrigger.active = false;
-            this.leftTrigger.touchId = null;
-            document.getElementById('lt')?.classList.remove('active');
-        }
-        if (this.rightTrigger.active) {
-            this.rightTrigger.active = false;
-            this.rightTrigger.touchId = null;
-            document.getElementById('rt')?.classList.remove('active');
-        }
-
-        this.flushPendingInput(true);
-    }
     
     handleMessage(data) {
         switch (data.type) {
-            case 'serverInfo':
-                if (data.websocketUrl) {
-                    window.__OCTOLINK_CONFIG__ = window.__OCTOLINK_CONFIG__ || {};
-                    window.__OCTOLINK_CONFIG__.websocketUrl = data.websocketUrl;
-                }
-                break;
-
             case 'assigned':
                 this.playerSlot = data.slot;
                 this.playerName = data.name;
@@ -1402,52 +1332,12 @@ class VirtualController {
     
     send(data) {
         if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-            try {
-                this.ws.send(JSON.stringify(data));
-            } catch (e) {
-                console.warn('Send failed:', e);
-            }
+            this.ws.send(JSON.stringify(data));
         }
     }
     
     sendState() {
-        this.queueInputFrame();
-    }
-
-    queueInputFrame() {
-        if (!this.isConnected) return;
-
-        if (this.ws && this.ws.readyState !== WebSocket.OPEN) return;
-
-        this.pendingInputPayload = {
-            ...this.state,
-            seq: ++this.inputSeq
-        };
-
-        if (this.pendingInputFrame) return;
-
-        this.pendingInputFrame = requestAnimationFrame(() => {
-            this.pendingInputFrame = null;
-            if (this.pendingInputPayload) {
-                this.send(this.pendingInputPayload);
-                this.pendingInputPayload = null;
-            }
-        });
-    }
-
-    flushPendingInput(force = false) {
-        if (this.pendingInputFrame) {
-            cancelAnimationFrame(this.pendingInputFrame);
-            this.pendingInputFrame = null;
-        }
-
-        if (force) {
-            this.send({ ...this.state, seq: ++this.inputSeq });
-        } else if (this.pendingInputPayload) {
-            this.send(this.pendingInputPayload);
-        }
-
-        this.pendingInputPayload = null;
+        this.send(this.state);
     }
     
     // Button handling
@@ -1474,24 +1364,17 @@ class VirtualController {
         // Touch events
         el.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            this.activeButtonTouches[btn] = e.changedTouches[0]?.identifier ?? null;
             this.pressButton(btn, true);
             el.classList.add('active');
         }, { passive: false });
         
         el.addEventListener('touchend', (e) => {
             e.preventDefault();
-            if (this.activeButtonTouches[btn] !== null && this.activeButtonTouches[btn] !== undefined) {
-                const touch = Array.from(e.changedTouches).find(t => t.identifier === this.activeButtonTouches[btn]);
-                if (!touch) return;
-            }
-            this.activeButtonTouches[btn] = null;
             this.pressButton(btn, false);
             el.classList.remove('active');
         }, { passive: false });
         
         el.addEventListener('touchcancel', (e) => {
-            this.activeButtonTouches[btn] = null;
             this.pressButton(btn, false);
             el.classList.remove('active');
         });
@@ -1518,11 +1401,7 @@ class VirtualController {
     
     pressButton(btn, pressed) {
         this.state[btn] = pressed;
-        if (pressed) {
-            this.sendState();
-        } else {
-            this.flushPendingInput(true);
-        }
+        this.sendState();
         
         // Haptic feedback on press
         if (pressed) {
@@ -1642,7 +1521,7 @@ class VirtualController {
                 this.state.rx = 0;
                 this.state.ry = 0;
             }
-            this.flushPendingInput(true);
+            this.sendState();
         };
         
         // Touch events
@@ -1751,7 +1630,7 @@ class VirtualController {
             tracker.touchId = null;
             element.classList.remove('active');
             this.state[name] = 0;
-            this.flushPendingInput(true);
+            this.sendState();
         };
         
         // Touch events - triggers are simple press/release for mobile

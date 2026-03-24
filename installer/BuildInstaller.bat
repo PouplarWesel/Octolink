@@ -34,15 +34,14 @@ if "%INNO_PATH%"=="" (
 
 echo [1/4] Building application...
 echo.
-cd /d "%~dp0..\Octolink"
-dotnet restore
+dotnet restore "%~dp0..\Octolink.sln"
 if %errorLevel% neq 0 (
     echo ERROR: dotnet restore failed!
     pause
     exit /b 1
 )
 
-dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o "..\publish"
+dotnet publish "%~dp0..\Octolink\Octolink.csproj" -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o "%~dp0..\publish"
 if %errorLevel% neq 0 (
     echo ERROR: dotnet publish failed!
     pause

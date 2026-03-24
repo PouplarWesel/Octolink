@@ -24,6 +24,8 @@ BuildPortable.bat
 
 This creates a ZIP file with the application and a setup script.
 
+The helper scripts now build from the root `Octolink.sln`, so they match the current project layout.
+
 ## What the Installer Does
 
 The installer performs the following:

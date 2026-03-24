@@ -2,6 +2,8 @@
 [Bb]in/
 [Oo]bj/
 publish/
+installer_output/
+temp_package/
 
 # Visual Studio
 .vs/
@@ -34,7 +36,7 @@ ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 
-# macOS
+# MacOS
 .DS_Store
 .AppleDouble
 .LSOverride

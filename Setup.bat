@@ -43,7 +43,7 @@ echo Adding firewall rules...
 :: Add firewall rules
 netsh advfirewall firewall add rule name="Octolink HTTP" dir=in action=allow protocol=tcp localport=5000 >nul 2>&1
 netsh advfirewall firewall add rule name="Octolink WebSocket" dir=in action=allow protocol=tcp localport=5001 >nul 2>&1
-netsh advfirewall firewall add rule name="Octolink ngrok" dir=in action=allow program="%~dp0Octolink\bin\Release\net8.0-windows\Octolink.exe" enable=yes >nul 2>&1
+netsh advfirewall firewall add rule name="Octolink App" dir=in action=allow program="%~dp0Octolink\bin\Release\net8.0-windows\Octolink.exe" enable=yes >nul 2>&1
 
 echo [OK] Firewall rules added
 echo.

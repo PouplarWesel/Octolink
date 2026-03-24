@@ -10,7 +10,6 @@ Turn your phone into a wireless game controller. Supports up to 8 players over l
 - Low latency WebSocket communication
 - Browser-based (no app install required)
 - Auto-reconnect support
-- Ngrok tunnel support for restricted networks
 
 ## Requirements
 
@@ -36,24 +35,12 @@ Download the .NET 8 Desktop Runtime from https://dotnet.microsoft.com/download/d
 ### Build from Source
 
 ```
-cd Octolink
 dotnet restore
-dotnet build --configuration Release
-dotnet run
+dotnet build Octolink.sln --configuration Release
+dotnet run --project Octolink/Octolink.csproj
 ```
 
 Requires .NET 8 SDK and Visual Studio 2022 or VS Code with C# extension.
-
-### Ngrok Support
-
-If your network blocks local-device access, you can tunnel Octolink through ngrok:
-
-1. Start Octolink on the PC
-2. Run `ngrok http 5000` and `ngrok http 5001` in separate terminals
-3. Set `OCTOLINK_PUBLIC_HTTP_URL` and `OCTOLINK_PUBLIC_WS_URL` if needed
-4. Open the public URL on your phone
-
-Octolink will also try to detect a local ngrok agent automatically.
 
 ## Usage
 
@@ -83,17 +70,10 @@ To reconnect after disconnection, tap the reconnect button and select your previ
 - Confirm both devices are on the same network
 - Allow the app through Windows Firewall
 - Try entering the URL manually
-- If local WiFi is blocked, use ngrok tunnels
 
 **High latency**
 - Use 5GHz WiFi
 - Move closer to the router
-- Prefer a stable direct link or wired PC connection
-
-**Stuck movement / input lag**
-- Reconnect the phone tab
-- Close other tabs to reduce browser throttling
-- Check that the connection status stays green
 
 **Controller not recognized in game**
 - Press a button to activate the controller

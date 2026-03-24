@@ -14,9 +14,8 @@ if not exist "..\installer_output" mkdir "..\installer_output"
 if not exist "temp_package" mkdir "temp_package"
 
 echo [1/4] Building application...
-cd /d "%~dp0..\Octolink"
-dotnet restore
-dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o "..\publish"
+dotnet restore "%~dp0..\Octolink.sln"
+dotnet publish "%~dp0..\Octolink\Octolink.csproj" -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o "%~dp0..\publish"
 if %errorLevel% neq 0 (
     echo ERROR: Build failed!
     pause
