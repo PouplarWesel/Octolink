@@ -15,6 +15,8 @@ This folder contains scripts to build a professional Windows installer for Octol
 
 3. The installer will be created at `installer_output\OctolinkSetup.exe`
 
+The installer is updateable: installing a newer build with the same app id will replace the old version and keep the app entry.
+
 ### Option 2: Manual Installation Package
 
 If you don't want to use Inno Setup, run:
@@ -35,6 +37,7 @@ The installer performs the following:
 3. **Configures Windows Firewall** (allows ports 5000 and 5001)
 4. **Sets up URL ACLs** (allows the server to bind to network addresses)
 5. **Creates shortcuts** in Start Menu and optionally on Desktop
+6. **Checks for ViGEmBus** and installs it automatically if missing
 
 ## Prerequisites for Building
 

@@ -192,6 +192,8 @@ namespace Octolink
                     LayoutStatusText.Text = "Run as Administrator or use ngrok tunnels.";
                 }
 
+                NgrokStatusText.Text = "If iPhone connects to page but not controller, keep the tab open and retry once after typing the name.";
+
                 // Update status
                 StatusIndicator.Fill = (SolidColorBrush)FindResource("SuccessBrush");
                 StatusText.Text = "Running";

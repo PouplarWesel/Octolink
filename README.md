@@ -42,6 +42,10 @@ dotnet run --project Octolink/Octolink.csproj
 
 Requires .NET 8 SDK and Visual Studio 2022 or VS Code with C# extension.
 
+### Installer
+
+Run the installer from `installer\BuildInstaller.bat` to create a normal Windows app install. New versions reuse the same app id, so installing an updated build replaces the old one.
+
 ## Usage
 
 ### PC

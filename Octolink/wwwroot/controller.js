@@ -161,6 +161,7 @@ class VirtualController {
         };
         
         this.elements = {
+            connectForm: document.getElementById('connect-form'),
             playerName: document.getElementById('player-name'),
             connectBtn: document.getElementById('connect-btn'),
             connectionStatus: document.getElementById('connection-status'),
@@ -201,7 +202,14 @@ class VirtualController {
         };
         
         // Event listeners
-        this.elements.connectBtn.addEventListener('click', () => this.connect());
+        this.elements.connectForm?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.connect();
+        });
+        this.elements.connectBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.connect();
+        });
         this.elements.backBtn.addEventListener('click', () => this.showScreen('connect'));
         this.elements.reconnectBtn.addEventListener('click', () => this.showScreen('reconnect'));
         this.elements.toggleLayoutBtn.addEventListener('click', () => this.toggleButtonLayout());
@@ -279,10 +287,12 @@ class VirtualController {
         
         this.elements.connectBtn.disabled = true;
         this.showStatus('Connecting...');
-        
-        this.initWebSocket(() => {
-            // Send connect message
-            this.send({ type: 'connect', name: this.playerName });
+
+        // Give iOS Safari a frame to settle after keyboard dismissal.
+        requestAnimationFrame(() => {
+            this.initWebSocket(() => {
+                this.send({ type: 'connect', name: this.playerName });
+            });
         });
     }
     
@@ -303,32 +313,52 @@ class VirtualController {
         if (this.ws) {
             this.ws.close();
         }
+
+        this.connectionAttempt = (this.connectionAttempt || 0) + 1;
+        const attemptId = this.connectionAttempt;
         
-        // Connect to WebSocket server (port + 1)
-        const wsPort = parseInt(location.port) + 1;
-        const wsUrl = `ws://${location.hostname}:${wsPort}/`;
+        // Prefer server-injected URL, then same-host fallback.
+        const runtime = window.__OCTOLINK_CONFIG__ || {};
+        const wsPort = location.port ? (parseInt(location.port, 10) + 1) : 5001;
+        const wsScheme = location.protocol === 'https:' ? 'wss' : 'ws';
+        const wsUrl = runtime.websocketUrl || `${wsScheme}://${location.hostname}:${wsPort}/`;
         
         try {
             this.ws = new WebSocket(wsUrl);
             this.ws.binaryType = 'arraybuffer';
+            this.connectionTimeout = setTimeout(() => {
+                if (attemptId !== this.connectionAttempt) return;
+                if (this.ws && this.ws.readyState !== WebSocket.OPEN) {
+                    try { this.ws.close(); } catch { }
+                    this.showStatus('Connection timed out. Try again.', true);
+                    this.elements.connectBtn.disabled = false;
+                }
+            }, 8000);
             
             this.ws.onopen = () => {
+                if (attemptId !== this.connectionAttempt) return;
+                clearTimeout(this.connectionTimeout);
                 console.log('WebSocket connected');
                 this.isConnected = true;
                 if (onOpen) onOpen();
             };
             
             this.ws.onmessage = (event) => {
+                if (attemptId !== this.connectionAttempt) return;
                 this.handleMessage(JSON.parse(event.data));
             };
             
             this.ws.onerror = (error) => {
+                if (attemptId !== this.connectionAttempt) return;
+                clearTimeout(this.connectionTimeout);
                 console.error('WebSocket error:', error);
                 this.showStatus('Connection error', true);
                 this.elements.connectBtn.disabled = false;
             };
             
             this.ws.onclose = () => {
+                if (attemptId !== this.connectionAttempt) return;
+                clearTimeout(this.connectionTimeout);
                 console.log('WebSocket closed');
                 this.isConnected = false;
                 this.updateConnectionStatus(false);
@@ -339,6 +369,7 @@ class VirtualController {
                 }
             };
         } catch (e) {
+            clearTimeout(this.connectionTimeout);
             this.showStatus('Failed to connect: ' + e.message, true);
             this.elements.connectBtn.disabled = false;
         }
@@ -346,6 +377,13 @@ class VirtualController {
     
     handleMessage(data) {
         switch (data.type) {
+            case 'serverInfo':
+                if (data.websocketUrl) {
+                    window.__OCTOLINK_CONFIG__ = window.__OCTOLINK_CONFIG__ || {};
+                    window.__OCTOLINK_CONFIG__.websocketUrl = data.websocketUrl;
+                }
+                break;
+
             case 'assigned':
                 this.playerSlot = data.slot;
                 this.playerName = data.name;

@@ -171,6 +171,10 @@ namespace Octolink
                     loopbackOnly = _loopbackOnly
                 });
 
+                // iOS Safari can be slow to finalize the first message after page load.
+                // Give it a brief window before reading so the initial connect isn't dropped.
+                await Task.Delay(50);
+
                 var buffer = new byte[4096];
 
                 while (webSocket.State == WebSocketState.Open && _running)

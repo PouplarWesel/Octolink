@@ -15,12 +15,22 @@ if not exist "..\installer_output" mkdir "..\installer_output"
 
 :: Check for Inno Setup
 set "INNO_PATH="
+if exist "%LOCALAPPDATA%\Programs\Inno Setup 6\ISCC.exe" (
+    set "INNO_PATH=%LOCALAPPDATA%\Programs\Inno Setup 6\ISCC.exe"
+)
 if exist "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" (
     set "INNO_PATH=C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
 )
 if exist "C:\Program Files\Inno Setup 6\ISCC.exe" (
     set "INNO_PATH=C:\Program Files\Inno Setup 6\ISCC.exe"
 )
+if "%INNO_PATH%"=="" (
+    for /f "delims=" %%P in ('where ISCC.exe 2^>nul') do (
+        set "INNO_PATH=%%P"
+        goto :inno_found
+    )
+)
+:inno_found
 
 if "%INNO_PATH%"=="" (
     echo ERROR: Inno Setup 6 not found!
@@ -78,13 +88,15 @@ if not exist "..\Octolink\icon.ico" (
     echo The installer will use a default icon.
     echo To add a custom icon, place icon.ico in the Octolink folder.
     echo.
-    :: Create a placeholder entry in the ISS file or skip
+    REM Create a placeholder entry in the ISS file or skip
 )
 echo.
 
 :: Build installer
 echo [4/4] Building installer with Inno Setup...
-"%INNO_PATH%" "OctolinkSetup.iss"
+for /f %%V in ('powershell -NoProfile -ExecutionPolicy Bypass -File "VersionInfo.ps1"') do set APP_VERSION=%%V
+echo Detected version !APP_VERSION!
+"%INNO_PATH%" /DMyAppVersion=!APP_VERSION! "OctolinkSetup.iss"
 if %errorLevel% neq 0 (
     echo ERROR: Inno Setup compilation failed!
     pause
@@ -101,7 +113,7 @@ echo   installer_output\OctolinkSetup.exe
 echo.
 echo The installer includes:
 echo   - Octolink application (self-contained)
-echo   - ViGEmBus driver installer
+echo   - ViGEmBus driver auto-check and install if missing
 echo   - Automatic firewall configuration
 echo   - Start menu and desktop shortcuts
 echo.
