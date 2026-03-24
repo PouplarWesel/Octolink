@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <rect width="192" height="192" rx="32" fill="#1a1a2e"/>
+  <g transform="translate(32, 56)">
+    <!-- Controller body -->
+    <ellipse cx="64" cy="40" rx="60" ry="35" fill="#0f3460"/>
+    <!-- Left stick -->
+    <circle cx="35" cy="35" r="15" fill="#16213e" stroke="#e94560" stroke-width="2"/>
+    <circle cx="35" cy="35" r="6" fill="#e94560"/>
+    <!-- Right stick -->
+    <circle cx="93" cy="35" r="15" fill="#16213e" stroke="#e94560" stroke-width="2"/>
+    <circle cx="93" cy="35" r="6" fill="#e94560"/>
+    <!-- D-pad -->
+    <rect x="15" y="50" width="10" height="25" rx="2" fill="#4ecca3"/>
+    <rect x="10" y="57" width="25" height="10" rx="2" fill="#4ecca3"/>
+    <!-- Face buttons -->
+    <circle cx="95" cy="55" r="6" fill="#4caf50"/>
+    <circle cx="105" cy="45" r="6" fill="#f44336"/>
+    <circle cx="85" cy="45" r="6" fill="#2196f3"/>
+    <circle cx="95" cy="35" r="6" fill="#ffc107"/>
+  </g>
+</svg>
